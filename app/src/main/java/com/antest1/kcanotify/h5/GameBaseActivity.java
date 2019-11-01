@@ -34,6 +34,7 @@ import com.bilibili.boxing.Boxing;
 import com.bilibili.boxing.BoxingMediaLoader;
 import com.bilibili.boxing.model.config.BoxingConfig;
 import com.bilibili.boxing.model.entity.BaseMedia;
+import com.nicdahlquist.pngquant.LibPngQuant;
 
 import org.json.JSONObject;
 import org.xwalk.core.XWalkActivity;
@@ -675,10 +676,25 @@ public abstract class GameBaseActivity extends XWalkActivity {
                             String newRespStr = serverResponse.string() + "window.onload=function(){document.body.style.background=\"#000\";document.getElementById(\"spacing_top\").style.height=\"0px\";};";
                             respByte = newRespStr.getBytes();
 
-                        }  else {
+                        } else {
                             respByte = serverResponse.bytes();
                         }
-                        saveFile(path, respByte);
+
+                        if(path.contains(".png")){
+                            saveFile(path + ".tmp", respByte);
+                            File origin = new File(filePath + ".tmp");
+                            File compressed = new File(filePath);
+                            if (!compressed.getParentFile().exists()) {
+                                compressed.getParentFile().mkdirs();
+                            }
+                            if(!compressed.exists()) {
+                                compressed.createNewFile();
+                            }
+                            new LibPngQuant().pngQuantFile(origin, compressed);
+                            respByte = readFileToBytes(compressed);
+                        } else {
+                            saveFile(path, respByte);
+                        }
 
                         // Inject code after caching, so it wont require re-downloading main.js after switching touch mode
                         if(path.contains("/kcs2/js/main.js")) {
