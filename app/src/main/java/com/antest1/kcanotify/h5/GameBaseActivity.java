@@ -591,8 +591,12 @@ public abstract class GameBaseActivity extends XWalkActivity {
             vib.vibrate(200);
         }
 
+        if(path == null) {
+            return null;
+        }
+
         // Handle pixi.min.js. Need to patch but not cache
-        if(path != null && path.contains("pixi.")) {
+        if(path.contains("pixi.")) {
             ResponseBody serverResponse = requestServer(uri, requestHeader);
             if (serverResponse != null) {
                 try{
@@ -606,7 +610,13 @@ public abstract class GameBaseActivity extends XWalkActivity {
             return null;
         }
 
-        if ("GET".equals(requestMethod) && path != null && (path.startsWith("/kcs2/") || path.startsWith("/kcs/") || path.startsWith("/gadget_html5/js/kcs_inspection.js"))) {
+        // Prevent OOI from caching the server name display
+        if (path.contains("ooi_moe_")) {
+            return null;
+        }
+
+
+        if ("GET".equals(requestMethod) && (path.startsWith("/kcs2/") || path.startsWith("/kcs/") || path.startsWith("/gadget_html5/js/kcs_inspection.js"))) {
             if(path.contains("version.json") || path.contains("index.php")){
                 return null;
             }
