@@ -754,7 +754,9 @@ public abstract class GameBaseActivity extends XWalkActivity {
             public void run()  {
                 Request.Builder builder = new Request.Builder().url(uri.toString());
                 for(Map.Entry<String, String> keySet : headerHeader.entrySet()){
-                    builder.addHeader(keySet.getKey(), keySet.getValue());
+                    if (keySet.getKey().compareToIgnoreCase("range") != 0) {
+                        builder.addHeader(keySet.getKey(), keySet.getValue());
+                    }
                 }
                 Request serverRequest = builder.build();
 
